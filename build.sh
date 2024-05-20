@@ -18,6 +18,8 @@ rpm-ostree install screen
 # this would install a package from rpmfusion
 # rpm-ostree install vlc
 
+flatpak install org.onlyoffice.desktopeditors
+
 #### Example for enabling a System Unit File
 
 systemctl enable podman.socket
