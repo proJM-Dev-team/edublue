@@ -14,6 +14,11 @@ RELEASE="$(rpm -E %fedora)"
 
 # this installs a package from fedora repos
 
+# Adding back x11 support by default
+rpm-ostree install kwin-x11
+rpm-ostree install plasma-workspace-x11
+
+# Adds firefox as another option alongside chromium
 rpm-ostree install firefox
 
 # this would install a package from rpmfusion
