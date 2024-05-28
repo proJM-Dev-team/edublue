@@ -1,8 +1,11 @@
 name: Build ISO
 
 on:
-  workflow_dispatch:
-  workflow_call:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '05 10 * * 2'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-iso
