@@ -1,0 +1,115 @@
+name: Build ISO
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-iso
+  cancel-in-progress: true
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image_name:
+          - edublue
+        major_version: [40]
+    steps:
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set Image Tag
+        id: generate-tag
+        shell: bash
+        run: |
+          TAG="stable"
+
+          if [[ "${{ github.ref_name }}" == "testing" ]]; then
+              TAG="testing"
+          fi
+
+          # Would like to implement in the future. This will allow us to support image tags from a PR.
+          #if [[ github.event.number ]]; then
+          #  TAG="pr-${{ github.event.number }}-${{ matrix.major_version }}"
+          #fi
+
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Set EXTRA_BOOT_PARAMS
+        id: generate-extra-params
+        shell: bash
+        run: |
+          EXTRA_BOOT_PARAMS=""
+          if [[ "${{ matrix.image_name }}" =~ "deck" ]]; then
+              EXTRA_BOOT_PARAMS="inst.resolution=1280x800"
+          fi
+          echo "extra-boot-params=${EXTRA_BOOT_PARAMS}" >> $GITHUB_OUTPUT
+
+      - name: Build ISOs
+        uses: jasonn3/build-container-installer@v1.2.0
+        id: build
+        with:
+          arch: x86_64
+          image_name: ${{ matrix.image_name }}
+          image_repo: ghcr.io/ublue-os
+          variant: 'Kinoite'
+          version: ${{ matrix.major_version }}
+          image_tag: ${{ steps.generate-tag.outputs.tag }}
+          secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
+          enrollment_password: 'ublue-os'
+          iso_name: ${{ matrix.image_name }}-${{ steps.generate-tag.outputs.tag }}.iso
+          enable_cache_dnf: "false"
+          enable_cache_skopeo: "false"
+          flatpak_remote_refs_dir: ${{ steps.generate-flatpak-dir-shortname.outputs.flatpak-dir-shortname }}
+          enable_flatpak_dependencies: "false"
+          extra_boot_params: ${{ steps.generate-extra-params.outputs.extra-boot-params }}
+          additional_templates: '/github/workspace/installer/lorax_templates/remove_root_password_prompt.tmpl'
+
+      - name: Move ISOs to Upload Directory
+        id: upload-directory
+        shell: bash
+        run: |
+          ISO_UPLOAD_DIR=${{ github.workspace }}/upload
+          mkdir ${ISO_UPLOAD_DIR}
+          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }} ${ISO_UPLOAD_DIR}
+          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
+          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
+
+      - name: Upload ISOs and Checksum to Job Artifacts
+        if: github.ref_name == 'testing'
+        #if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image_name }}-${{ steps.generate-tag.outputs.tag }}-${{ matrix.major_version}}
+          path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+          if-no-files-found: error
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+
+      - name: Upload ISOs and Checksum to R2
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
+        shell: bash
+        env:
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_REGION: auto
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          SOURCE_DIR: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rclone
+          rclone copy $SOURCE_DIR R2:bazzite
