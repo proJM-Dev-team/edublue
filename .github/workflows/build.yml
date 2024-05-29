@@ -149,5 +149,43 @@ jobs:
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
 
-      #- name: Build Container Installer
-      #  uses: JasonN3/build-container-installer@v1.2.0
+      - name: Build Container Installer
+        uses: JasonN3/build-container-installer@v1.2.0
+
+      - name: Move ISOs to Upload Directory
+        id: upload-directory
+        shell: bash
+        run: |
+          ISO_UPLOAD_DIR=${{ github.workspace }}/upload
+          mkdir ${ISO_UPLOAD_DIR}
+          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }} ${ISO_UPLOAD_DIR}
+          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
+          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
+
+      - name: Upload ISOs and Checksum to Job Artifacts
+        if: github.ref_name == 'testing'
+        #if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image_name }}-${{ steps.generate-tag.outputs.tag }}-${{ matrix.major_version}}
+          path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+          if-no-files-found: error
+          retention-days: 0
+          compression-level: 0
+          overwrite: true
+
+      - name: Upload ISOs and Checksum to R2
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
+        shell: bash
+        env:
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_REGION: auto
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          SOURCE_DIR: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rclone
+          rclone copy $SOURCE_DIR R2:edublue
