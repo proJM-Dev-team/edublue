@@ -157,30 +157,18 @@ jobs:
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
 
-      - name: Set EXTRA_BOOT_PARAMS
-        id: generate-extra-params
-        shell: bash
-        run: |
-          EXTRA_BOOT_PARAMS=""
-          if [[ "${{ matrix.image_name }}" =~ "deck" ]]; then
-              EXTRA_BOOT_PARAMS="inst.resolution=1280x800"
-          fi
-          echo "extra-boot-params=${EXTRA_BOOT_PARAMS}" >> $GITHUB_OUTPUT
+      #- name: Set EXTRA_BOOT_PARAMS
+      #  id: generate-extra-params
+      #  shell: bash
+      #  run: |
+      #    EXTRA_BOOT_PARAMS=""
+      #    if [[ "${{ matrix.image_name }}" =~ "deck" ]]; then
+      #        EXTRA_BOOT_PARAMS="inst.resolution=1280x800"
+      #    fi
+      #    echo "extra-boot-params=${EXTRA_BOOT_PARAMS}" >> $GITHUB_OUTPUT
 
       - name: Build ISO
         uses: jasonn3/build-container-installer@v1.2.0
-        id: build
-        with:
-          arch: x86_64
-          image_name: ${{ matrix.image_name }}
-          image_repo: ghcr.io/projm-dev-team
-          image_tag: ${{ steps.build_image.outputs.tags }}
-          secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
-          enrollment_password: 'ublue-os'
-          iso_name: edublue-${{ steps.build_image.outputs.tags }}.iso
-          enable_cache_dnf: "false"
-          enable_cache_skopeo: "false"
-          extra_boot_params: ${{ steps.generate-extra-params.outputs.extra-boot-params }}
 
       - name: Move ISOs to Upload Directory
         id: upload-directory
