@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '05 10 * * *'  # 10:05am UTC everyday
+    - cron: '05 10 * * 1'
   push:
     branches:
       - main
@@ -170,23 +170,11 @@ jobs:
       - name: Build ISO
         uses: jasonn3/build-container-installer@v1.2.0
 
-      - name: Move ISOs to Upload Directory
-        id: upload-directory
-        shell: bash
-        run: |
-          ISO_UPLOAD_DIR=${{ github.workspace }}/upload
-          mkdir ${ISO_UPLOAD_DIR}
-          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }} ${ISO_UPLOAD_DIR}
-          mv ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM ${ISO_UPLOAD_DIR}
-          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
-
       - name: Upload ISOs and Checksum to Job Artifacts
-        if: github.ref_name == 'testing'
-        #if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: edublue-${{ steps.build_image.outputs.tags }}
-          path: ${{ steps.upload-directory.outputs.iso-upload-dir }}
+          path: ${{ steps.build.outputs.iso_path }}
           if-no-files-found: error
           retention-days: 0
           compression-level: 0
