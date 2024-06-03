@@ -172,13 +172,13 @@ jobs:
         id: build
         with:
           arch: x86_64
-          image_name: edublue
-          image_repo: ghcr.io/projm-dev-team
+          #image_name: edublue
+          #image_repo: ghcr.io/projm-dev-team
           secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
           enrollment_password: 'ublue-os'
           iso_name: edublue.iso
-          enable_cache_dnf: "false"
-          enable_cache_skopeo: "false"
+          #enable_cache_dnf: "false"
+          #enable_cache_skopeo: "false"
 
       - name: Upload ISOs and Checksum to Job Artifacts
         uses: actions/upload-artifact@v4
