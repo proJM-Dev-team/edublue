@@ -175,10 +175,10 @@ jobs:
           image_name: ${{ matrix.image_name }}
           image_repo: ghcr.io/projm-dev-team
           version: ${{ matrix.major_version }}
-          image_tag: ${{ steps.generate-tag.outputs.tag }}
+          image_tag: ${{ steps.build_image.outputs.tags }}
           secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
           enrollment_password: 'ublue-os'
-          iso_name: ${{ matrix.image_name }}-${{ steps.generate-tag.outputs.tag }}.iso
+          iso_name: ${{ matrix.image_name }}-${{ steps.build_image.outputs.tags }}.iso
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
 
