@@ -36,7 +36,7 @@ ARG SOURCE_IMAGE="aurora-main-hardened"
 ARG SOURCE_SUFFIX=""
 
 ## SOURCE_TAG arg must be a version built for the specific image: eg, 39, 40, gts, latest
-ARG SOURCE_TAG="40"
+ARG SOURCE_TAG="39"
 
 
 ### 2. SOURCE IMAGE
