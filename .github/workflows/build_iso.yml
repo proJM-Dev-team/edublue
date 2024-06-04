@@ -1,16 +1,11 @@
 ---
-name: build-ublue-custom
+name: build-ublue-image-iso
 on:
   pull_request:
     branches:
       - main
   schedule:
-    - cron: '05 10 * * 1'
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**/README.md'
+    - cron: '05 10 1 * *'
   workflow_dispatch:
   workflow_call:
 
