@@ -46,6 +46,7 @@ jobs:
         run: |
           # Generate a timestamp for creating an image version history
           TIMESTAMP="$(date +%Y%m%d)"
+          fedora_version="40"
           COMMIT_TAGS=()
           BUILD_TAGS=()
 
@@ -53,6 +54,7 @@ jobs:
           SHA_SHORT="${GITHUB_SHA::7}"
           COMMIT_TAGS+=("pr-${{ github.event.number }}")
           COMMIT_TAGS+=("${SHA_SHORT}")
+          COMMIT_TAGS+=("${fedora_version}")
 
           # Append matching timestamp tags to keep a version history
           for TAG in "${BUILD_TAGS[@]}"; do
@@ -164,7 +166,7 @@ jobs:
           image_name: edublue
           image_repo: ghcr.io/projm-dev-team
           variant: 'Kinoite'
-          version: '40'
+          version: ${{ steps.generate-tags.fedora_version }}
           secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
           enrollment_password: 'ublue-os'
           iso_name: edublue.iso
