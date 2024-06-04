@@ -164,6 +164,7 @@ jobs:
           image_name: edublue
           image_repo: ghcr.io/projm-dev-team
           variant: 'Kinoite'
+          version: '40'
           secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
           enrollment_password: 'ublue-os'
           iso_name: edublue.iso
