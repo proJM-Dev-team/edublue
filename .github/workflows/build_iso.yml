@@ -46,7 +46,6 @@ jobs:
         run: |
           # Generate a timestamp for creating an image version history
           TIMESTAMP="$(date +%Y%m%d)"
-          fedora_version="40"
           COMMIT_TAGS=()
           BUILD_TAGS=()
 
@@ -62,7 +61,7 @@ jobs:
 
           BUILD_TAGS+=("${TIMESTAMP}")
           BUILD_TAGS+=("latest")
-          BUILD_TAGS+=("${fedora_version}")
+          BUILD_TAGS+=("40")
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "Generated the following commit tags: "
