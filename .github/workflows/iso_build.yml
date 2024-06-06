@@ -1,11 +1,11 @@
 ---
-name: build-ublue-image-iso
+name: Build-iso
 on:
   pull_request:
     branches:
       - main
   schedule:
-    - cron: '05 10 1 * *'
+    - cron: '05 10 1 * *' # 10:05am UTC first day of each month
   workflow_dispatch:
   workflow_call:
 
@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MY_IMAGE_NAME: "${{ github.event.repository.name }}"  # the name of the image produced by this build, matches repo names
+  MY_IMAGE_NAME: "${{ github.event.repository.name }}"  # the name of the image
   MY_IMAGE_DESC: "A custom image designed for school and work environments"
-  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
 
 jobs:
   build_push:
@@ -138,11 +138,6 @@ jobs:
           password: ${{ env.REGISTRY_PASSWORD }}
           extra-args: |
             --disable-content-trust
-
-      # This section is optional and only needs to be enabled in you plan on distributing
-      # your project to others to consume. You will need to create a public and private key
-      # using Cosign and save the private key as a repository secret in Github for this workflow
-      # to consume. For more details, review the image signing section of the README.
 
       # Sign container
       - uses: sigstore/cosign-installer@v3.5.0
