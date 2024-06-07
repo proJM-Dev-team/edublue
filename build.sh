@@ -22,8 +22,7 @@ rpm-ostree install plasma-workspace-x11
 rpm-ostree install firefox
 
 # Install docker for winapps
-rpm-ostree install dnf-plugins-core
-rpm-ostree config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+ostree remote add Docker https://download.docker.com/linux/fedora/docker-ce.repo
 rpm-ostree install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # this would install a package from rpmfusion
