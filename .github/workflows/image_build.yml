@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '05 10 * * 1'  # 10:05am UTC everyweek on Monday
+    - cron: '00 20 * * *'  # 20:00 UTC everyday (2 hours after secureblue images start to build).
   push:
     branches:
       - main
