@@ -4,32 +4,18 @@ set -ouex pipefail
 
 RELEASE="$(rpm -E %fedora)"
 
-
-### Install packages
-
-# Packages can be installed from any enabled yum repo on the image.
-# RPMfusion repos are available by default in ublue main images
-# List of rpmfusion packages can be found here:
-# https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
-
-# this installs a package from fedora repos
-
 # Adding back x11 support by default
-rpm-ostree install kwin-x11
-rpm-ostree install plasma-workspace-x11
+rpm-ostree install kwin-x11 plasma-workspace-x11
 
 # Adds firefox as another option alongside chromium
 rpm-ostree install firefox
 
 # Install docker for winapps
-ostree remote add docker-ce https://download.docker.com/linux/fedora/docker-ce.repo
-rpm-ostree update
-rpm-ostree install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+rpm-ostree install https://download.docker.com/linux/fedora/40/x86_64/stable/Packages/docker-ce-26.1.4-1.fc40.x86_64.rpm
+rpm-ostree install https://download.docker.com/linux/fedora/40/x86_64/stable/Packages/docker-ce-cli-26.1.4-1.fc40.x86_64.rpm
+rpm-ostree install https://download.docker.com/linux/fedora/40/x86_64/stable/Packages/containerd.io-1.6.33-3.1.fc40.x86_64.rpm
+rpm-ostree install https://download.docker.com/linux/fedora/40/x86_64/stable/Packages/docker-buildx-plugin-0.14.1-1.fc40.x86_64.rpm
+rpm-ostree install https://download.docker.com/linux/fedora/40/x86_64/stable/Packages/docker-compose-plugin-2.27.1-1.fc40.x86_64.rpm
 
-# this would install a package from rpmfusion
-
-# rpm-ostree install vlc
-
-#### Example for enabling a System Unit File
-
+# Example for enabling a System Unit File
 systemctl enable podman.socket
