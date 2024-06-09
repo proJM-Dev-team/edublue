@@ -22,7 +22,7 @@ rpm-ostree install plasma-workspace-x11
 rpm-ostree install firefox
 
 # Install docker for winapps
-ostree remote add "Docker CE Stable" https://download.docker.com/linux/fedora/docker-ce.repo
+ostree remote add docker-ce https://download.docker.com/linux/fedora/docker-ce.repo
 rpm-ostree update
 rpm-ostree install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
