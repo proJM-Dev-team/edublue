@@ -9,6 +9,10 @@ on:
   pull_request:
   workflow_dispatch: # allow manually triggering builds
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-iso
+  cancel-in-progress: true
+
 jobs:
   build_push:
     name: Build Custom Image
@@ -21,10 +25,6 @@ jobs:
       
     strategy:
       fail-fast: false # stop GH from cancelling all matrix builds if one fails
-      matrix:
-        recipe:
-          # !! Add your recipes here 
-          - recipe.yml
           
     steps:
       - name: Build ISOs
