@@ -23,6 +23,7 @@ modules:
     install:
       # - micro
       # - starship
+      - chromium
       - docker-ce 
       - docker-ce-cli 
       - containerd.io 
@@ -42,6 +43,7 @@ modules:
       # repo-name: flathub
       # repo-title: "Flathub (system-wide)" # Optional; this sets the remote's user-facing name in graphical frontends like GNOME Software
       install:
+        - org.onlyoffice.desktopeditors
         # - org.mozilla.firefox
         # - org.gnome.Loupe
         # - one.ablaze.floorp//lightning # This is an example of flatpak which has multiple branches in selection (flatpak//branch).
