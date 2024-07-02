@@ -33,7 +33,7 @@ Boot from the BIOS/UEFI by either changing the boot order or overriding the next
 
 Wait for the installer to load and go through all the install steps. Make sure that the root user is enabled with a strong password and the user is not given administrator.
 
-Once the process is completed reboot and follow the secureblue setup steps. 
+Once the process is completed reboot and update all package if needed. 
 
 Make sure everything is up to date and then the install is complete.
 
